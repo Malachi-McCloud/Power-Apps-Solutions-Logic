@@ -1,0 +1,91 @@
+// On Start and On date value if dropdown or if a selection
+// Step 1: Clear the collection and populate it with filtered records from the first data source.
+// The records are filtered based on date ranges (start and end dates within the selected year).
+// Each record is transformed to include specific fields: Title, Start Date, End Date, and Source.
+ClearCollect(
+    collection1, // Clear and initialize the collection
+    ForAll(
+        Filter( // If you have dropdowns for year or month to filter by input those for the values below to build the date string
+            dataSource1, // Filter records from the first data source
+            startDateField >= Date(selectedYear, 1, 1) && // Start date is within the selected year 
+            startDateField <= Date(selectedYear, 12, 31) &&
+            endDateField >= Date(selectedYear, 1, 1) && // End date is within the selected year
+            endDateField <= Date(selectedYear, 12, 31)
+        ),
+        {
+            titleField: Title, // Map the title field
+            startField: startDateField, // Map the start date field
+            endField: endDateField, // Map the end date field
+            sourceField: "Source1" // Add a source identifier
+        }
+    )
+);
+
+// Step 2: Add records from the second data source to the collection.
+// Similar filtering and transformation are applied to include Title, Start Date, End Date, and Source.
+Collect(
+    collection1, // Add records to the existing collection
+    ForAll(
+        Filter(
+            dataSource2, // Filter records from the second data source
+            startDateField >= Date(selectedYear, 1, 1) && // Start date is within the selected year
+            startDateField <= Date(selectedYear, 12, 31) &&
+            endDateField >= Date(selectedYear, 1, 1) && // End date is within the selected year
+            endDateField <= Date(selectedYear, 12, 31)
+        ),
+        {
+            titleField: Title, // Map the title field
+            startField: startDateField, // Map the start date field
+            endField: endDateField, // Map the end date field
+            sourceField: "Source2" // Add a source identifier
+        }
+    )
+);
+
+// Step 3: Add records from the third data source to the collection.
+// Similar filtering and transformation are applied to include Title, Start Date, End Date, and Source.
+Collect(
+    collection1, // Add records to the existing collection
+    ForAll(
+        Filter(
+            dataSource3, // Filter records from the third data source
+            startDateField >= Date(selectedYear, 1, 1) && // Start date is within the selected year
+            startDateField <= Date(selectedYear, 12, 31) &&
+            endDateField >= Date(selectedYear, 1, 1) && // End date is within the selected year
+            endDateField <= Date(selectedYear, 12, 31)
+        ),
+        {
+            titleField: Title, // Map the title field
+            startField: startDateField, // Map the start date field
+            endField: endDateField, // Map the end date field
+            sourceField: "Source3" // Add a source identifier
+        }
+    )
+);
+
+// Step 4: Remove duplicate records from the collection.
+// Deduplication is based on matching Title, Start Date, and End Date fields.
+Clear(collection2); // Initialize a new collection for deduplicated records
+ForAll(
+    collection1, // Iterate through the original collection
+    With(
+        {currentRecord: ThisRecord}, // Store the current record in a variable
+        If(
+            IsBlank(
+                LookUp(
+                    collection2, // Check if the record already exists in the deduplicated collection
+                    titleField = currentRecord.titleField &&
+                    startField = currentRecord.startField &&
+                    endField = currentRecord.endField
+                )
+            ),
+            Collect(collection2, currentRecord) // Add the current record to the deduplicated collection if it doesn't exist
+        )
+    )
+);
+
+// Step 5: Sort the deduplicated collection by Start Date in ascending order.
+ClearCollect(
+    collection2, // Clear and reinitialize the deduplicated collection
+    SortByColumns(collection2, "startField", SortOrder.Ascending) // Sort by the Start Date field
+)
