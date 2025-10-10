@@ -1,0 +1,29 @@
+// This carries the logic for the main gallery holding the Gantt Chart visuals
+// Placement Calculation guide coming later
+// This file contains several components pseudocode for a reuse at a later date
+// Created by Malachi McCloud
+
+// Selected item highlights
+BorderColor: Color.Black
+Fill: RGBA(56, 96, 178, .25) // .25 fades color for a highlighted look
+Width: 'Gantt Tasks'.Width // To circle in the item
+
+
+// Item Name Info
+
+Text: ThisItem.ItemTitle
+X: Value(StartDay.Text) * 'Gantt Tasks'.Width/365 // Code takes the the starting day by the width created by the task divided by the number of days in a year
+
+
+// Indicator Info (Actual Bar)
+
+Fill: Swtich(ThisItem.[WhateverYouWantToColorCodeBy], "Value", Color.Red, Color.Gray)
+X: Value(StartDays.Text) * 'Gantt Tasks'.Width/365 // Same Concept as before with placement on the screen
+Width: (Value(EndDays.Text)-Value(StartDays.Text)) * 'Gantt Tasks'.Width/365
+
+// Calculation for EndDays Label
+Text: DateDiff(Date(dd_YearSelection.Selected.Value,1,1), DateValue(ClassEndDate.Text))+1
+
+// Calculation for StartDays Label
+Text: DateDiff(Date(dd_YearSelection.Selected.Value,1,1), DateValue(ClassStartDate.Text))+1
+
